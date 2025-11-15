@@ -32,8 +32,8 @@ A Python script to monitor your public (WAN) IP address and expose it as a Prome
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/<your-username>/<repo-name>.git
-cd <repo-name>
+git clone https://github.com/GGamerzz/WAN-IP-Changes-Script.git
+cd WAN-IP-Changes-Script
 ```
 
 ---
@@ -53,13 +53,13 @@ python3 update_wan_ip.py
 Mount the directory where `wan_ip.prom` is written for the textfile collector:
 
 ```
-/root/wan_ip_checker/textfiles
+/wan_ip_checker/textfiles
 ```
 
 **Example command-line flag:**
 
 ```bash
---collector.textfile.directory=/root/wan_ip_checker/textfiles
+--collector.textfile.directory=/wan_ip_checker/textfiles
 ```
 
 ### Schedule with Cron
@@ -67,7 +67,7 @@ Mount the directory where `wan_ip.prom` is written for the textfile collector:
 To run the script every 12 hours, add this to your crontab:
 
 ```bash
-0 */12 * * * python3 /root/wan_ip_checker/update_wan_ip.py
+0 */12 * * * python3 /wan_ip_checker/update_wan_ip.py
 ```
 
 ---
