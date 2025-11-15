@@ -32,8 +32,8 @@ A Python script to monitor your public (WAN) IP address and expose it as a Prome
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/GGamerzz/WAN-IP-Changes-Script.git
-cd WAN-IP-Changes-Script
+git clone https://github.com/GGamerzz/Wan-IP-Changes-Script.git
+cd Wan-IP-Changes-Script
 ```
 
 ---
