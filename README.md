@@ -1,66 +1,95 @@
-WAN IP Checker
+# WAN IP Checker
 
-This Python script monitors your public (WAN) IP address and exposes it as a Prometheus metric for monitoring in Grafana. It can be used to track changes in your IP over time and trigger alerts if it changes.
+A Python script to monitor your public (WAN) IP address and expose it as a Prometheus metric for visualization and alerting in Grafana. Ideal for dynamic IP environments or home labs.
 
-Features
+---
 
-Checks your current public IP from a reliable web service.
+## Features
 
-Compares the current IP with the last known IP.
+- Checks your current public IP via a reliable web service
+- Compares the current IP with the last known IP
+- Writes a Prometheus-compatible `.prom` file (`wan_ip.prom`) for `node_exporter` textfile collector
+- Indicates IP changes: `wan_ip_change = 1` if changed, `wan_ip_change = 0` if unchanged
+- Stores the last known IP in `last_ip.txt`
+- Can be scheduled to run periodically using cron
 
-Writes the result as a Prometheus-compatible .prom file (wan_ip.prom) for node_exporter textfile collector.
+---
 
-Marks whether the IP has changed (wan_ip_change = 1) or stayed the same (wan_ip_change = 0).
+## How It Works
 
-Stores the last known IP in last_ip.txt for comparison on the next run.
+1. Queries `http://checkip.dyndns.com/` to get your current public IP
+2. Reads the previous IP from `last_ip.txt` (creates it on first run if missing)
+3. Sets `wan_ip_change` to:
+   - `1` if the IP has changed, updating `last_ip.txt`
+   - `0` if the IP is unchanged
+4. Writes the `.prom` file in the directory monitored by `node_exporter`
+5. Prometheus scrapes the metric, and Grafana can visualize or trigger alerts
 
-Can be scheduled to run periodically using cron.
+---
 
-How it Works
+## Installation
 
-The script queries http://checkip.dyndns.com/ to determine your current public IP.
+### Clone the Repository
 
-Reads the previous IP from last_ip.txt (created on first run if missing).
-
-If the current IP is different from the last recorded IP, it sets wan_ip_change to 1 and updates last_ip.txt.
-
-If the IP is unchanged, it sets wan_ip_change to 0.
-
-The .prom file is written in the directory monitored by node_exporter’s textfile collector. Prometheus can scrape this metric, and Grafana can visualize it or trigger alerts.
-
-Usage
-
-Clone the repository to your server:
-
+```bash
 git clone https://github.com/<your-username>/<repo-name>.git
 cd <repo-name>
+```
 
+---
 
-Ensure you have Python 3 installed.
+## Usage
 
-Run the script manually to test:
+### Run Manually
 
+To run the script manually:
+
+```bash
 python3 update_wan_ip.py
+```
 
+### Configure Node Exporter
 
-Configure the node_exporter container (or host installation) to include a textfile collector that points to the directory where wan_ip.prom is written. For example:
+Mount the directory where `wan_ip.prom` is written for the textfile collector:
 
+```
 /root/wan_ip_checker/textfiles
+```
 
+**Example command-line flag:**
 
-Add a cron job to run the script periodically (e.g., every 12 hours):
+```bash
+--collector.textfile.directory=/root/wan_ip_checker/textfiles
+```
 
+### Schedule with Cron
+
+To run the script every 12 hours, add this to your crontab:
+
+```bash
 0 */12 * * * python3 /root/wan_ip_checker/update_wan_ip.py
+```
 
+---
 
-Configure Prometheus to scrape node_exporter metrics, and optionally set up a Grafana alert rule to notify when wan_ip_change == 1.
+## Integration
 
-When to Use
+### Prometheus & Grafana
 
-If you have a dynamic WAN IP and need to monitor when it changes.
+- **Prometheus** scrapes the metric from `node_exporter`
+- **Grafana** can display the current WAN IP and trigger alerts when `wan_ip_change == 1`
 
-For home labs or servers behind residential ISPs where public IP changes can affect remote access.
+---
 
-When you want to integrate WAN IP tracking into your Prometheus + Grafana monitoring stack.
+## When to Use
 
-Useful for triggering alerts or automations when your IP changes.
+- Monitoring dynamic WAN IPs
+- Home labs or servers behind residential ISPs
+- Integrating WAN IP tracking into a Prometheus + Grafana stack
+- Triggering alerts or automations on IP changes
+
+---
+
+## License
+
+This project is licensed under the GNU General Public License v3.0 - see the LICENSE file for details.
